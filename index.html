@@ -23,7 +23,7 @@
         var App = React.createClass({
             getInitialState: function(){
                return{
-                   currentCategory: 1,
+                   currentCategory: 0,
                    text: '',
                    categories: [
                         {
@@ -94,21 +94,20 @@
                 },
             
                 handleCategoryChange: function(categoryID){
+                    
                     let categories = this.state.categories;
                     let index = categories.findIndex(x => x.id === categoryID);
-                    console.log(index);
                     
-                    // find category to update
-//                        this.state.categories.map( category => {
-//                            if(category.id == categoryID){
-//                                
-//                               
-//                            }
-//
-//                        })
-                    // Change category ClassName to active
+                    categories.map( category => {
+                        category.className = "";
+                    })
+                    categories[index].className = "active";
+                    this.state.currentCategory = categories[index].id;
                     
-                    // erase className of other categories
+                    this.setState({
+                        categories: categories,
+                        currentCategory: this.state.currentCategory
+                    })
                     
                 },
             
