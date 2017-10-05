@@ -1,11 +1,210 @@
 <!DOCTYPE html>
 <head>
     <title>My first page</title>
-    <link rel='stylesheet' href="./src/css/main.css">
+    <link rel='stylesheet' href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script  src="https://fb.me/react-0.14.7.js"></script>
+    <script  src="https://fb.me/react-dom-0.14.7.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/babel-core/5.8.25/browser.min.js"></script>
+    
+    
 </head>
 <body>
-    <h1>First Page</h1>
+    <div class='container'>
+        <div classs="row">
+            <div class='col-md-12'>
+                <div id='app'></div>
+            </div>
+        </div>
+    </div>
     
     
-    <script src="./src/js/main.js"></script>
+    
+    <script type='text/babel'>
+        var App = React.createClass({
+            getInitialState: function(){
+               return{
+                   currentCategory: 1,
+                   text: '',
+                   categories: [
+                        {
+                            id: 1,
+                            name: "Bench Press",
+                            className: 'active'
+                        },
+                        {
+                            id: 2,
+                            name: "Squats",
+                            className: ''
+                        },
+                        {
+                            id: 3,
+                            name: "Biceps Curl",
+                            className: ''
+                        }
+                   ],
+                   
+                   trainingItems: [
+                       {
+                           id: 1,
+                           categoryID: 1,
+                           weight: 20,
+                           reps: 10
+                       },
+                       {
+                           id: 2,
+                           categoryID: 1,
+                           weight: 70,
+                           reps: 6
+                       },
+                       {
+                           id: 3,
+                           categoryID: 2,
+                           weight: 55,
+                           reps: 9
+                       },
+                       {
+                           id: 4,
+                           categoryID: 3,
+                           weight: 45,
+                           reps: 12
+                       }
+                   ]
+               } 
+            },
+            
+            propTypes: {
+                title: React.PropTypes.string
+            },
+            
+            getDefaultProps: function(){
+              return {
+                  title: "From Props - place for the trainings"
+              }  
+            },
+            
+            render: function(){
+                return(
+                    <div>
+                        <TrainingCategories categories={this.state.categories} onCategoryChange={this.handleCategoryChange} />
+                        
+                        <TrainingForm onTrainingAdd={this.handleTrainingAdd} />
+                        <TrainingItems trainingItems={this.state.trainingItems} categories={this.state.categories} />
+                    </div>
+                    )   
+                },
+            
+                handleCategoryChange: function(categoryID){
+                    let categories = this.state.categories;
+                    let index = categories.findIndex(x => x.id === categoryID);
+                    console.log(index);
+                    
+                    // find category to update
+//                        this.state.categories.map( category => {
+//                            if(category.id == categoryID){
+//                                
+//                               
+//                            }
+//
+//                        })
+                    // Change category ClassName to active
+                    
+                    // erase className of other categories
+                    
+                },
+            
+                handleTrainingAdd: function(text){
+                    
+                    var newTraining = {
+                        id: this.state.trainingItems.length +1,
+                        weight: text,
+                        categoryID: 3,
+                        reps: 2
+                    }
+                    
+                    this.setState({trainingItems: this.state.trainingItems.concat(newTraining)})
+                }
+            
+            
+            });
+
+        var TrainingCategories = React.createClass({
+            render: function(){
+                return(
+                    <ul className="nav nav-pills">
+                        {    
+                           this.props.categories.map(category => {
+                               return <li role="presentation" key={category.id} className={category.className} onClick={this.categoryChange.bind(this, category)}><a href="#">{category.name}</a> </li>
+                            })
+                        }
+                    </ul>
+                )
+            },
+            
+            // getting category ID after clicked 
+            categoryChange: function(category){
+                    var categoryID = category.id;
+                    this.props.onCategoryChange(categoryID);
+                }
+            
+            
+        });
+
+        var TrainingItems = React.createClass({
+           render: function(){
+               return(
+                    <ul className="list-group">
+                       {    
+                           this.props.trainingItems.map(training => {
+                               return <li training={training} key={training.id} className="list-group-item">{training.weight}kg x{training.reps}</li>
+                           })
+                       }
+                    </ul>
+               )
+           }, 
+        });
+
+        var TrainingForm = React.createClass({
+           render: function(){
+               return(
+                    <div>
+                        <form onSubmit={this.onSubmit} >
+                            <div className='form-group'>
+                                <label>Weight</label>
+                                <input type='text' ref='text' onChange={this.onChange} className='form-control' />
+                            </div>
+
+                        </form>
+                    </div>
+               )
+           }, 
+            
+            onChange: function(){
+                console.log('changing text');
+            },
+            
+            onSubmit: function(e){
+                e.preventDefault();
+                var text = this.refs.text.value.trim();
+                
+                if(!text){
+                    alert('Enter a training');
+                    return;
+                }
+                
+                this.props.onTrainingAdd(text);
+                this.refs.text.value = '';
+                
+            }
+            
+        });
+
+
+        
+
+        ReactDOM.render(
+            <App />, 
+            document.getElementById('app')
+        );
+    </script>
+    
 </body>
