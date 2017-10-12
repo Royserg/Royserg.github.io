@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import TrainingItem from './TrainingItem';
+import WorkoutItem from './WorkoutItem';
 
 class Trainings extends Component {
   deleteProject(id){
@@ -8,25 +8,21 @@ class Trainings extends Component {
   
   render(){
     let currentCategory = this.props.currentCategory;
-    let trainingItems;
+    let workoutItems;
     
-    if(this.props.trainings){
-      trainingItems = this.props.trainings.map(training => {
-        if(training.category === currentCategory){
-          return(
-          <TrainingItem onDelete={this.deleteProject.bind(this)} key={training.id} training={training} />
-          );  
-        }
-      });
-    }
-    
-    
+    if(this.props.workouts){
+      workoutItems = this.props.workouts.map( workout => {
+        return (
+          <WorkoutItem key={workout.id} workout={workout} />
+        )
+        
+      })}
+ 
     return(
       <div className='trainings'>
         <h3>Latest Training</h3>
-        {trainingItems}
+        {workoutItems}
       </div>
-
     );
   }
 }

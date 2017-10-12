@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import uuid from 'uuid';
 
 class AddTraining extends Component {
   constructor(){
@@ -16,8 +15,6 @@ class AddTraining extends Component {
     
     if(weight && reps){
       this.setState({newTraining:{
-        id: uuid.v4(),
-        category: this.props.currentCategory,
         weight: weight,
         reps: reps
       }}, function(){

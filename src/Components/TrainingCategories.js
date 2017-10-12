@@ -3,8 +3,12 @@ import AddCategory from './AddCategory'
 
 class TrainingCategories extends Component {
   getCategoryName(e){
+    let categories = this.props.categories;
     let categoryName = e.target.textContent.trim();
-    this.props.onCategoryChange(categoryName);
+    let index = categories.findIndex(x => x.name === categoryName);
+    console.log(e.target.textContent.trim());
+    
+    this.props.onCategoryChange(index);
   }
   
   
@@ -17,7 +21,7 @@ class TrainingCategories extends Component {
     if(this.props.categories){
       trainingCategories = this.props.categories.map(category => {
         return (
-          <li className={category.className} key={category.id} onClick={this.getCategoryName.bind(this)}><a href='#'> {category.name}</a></li>
+          <li className={category.className} key={category.id} onClick={this.getCategoryName.bind(this)}><a> {category.name}</a></li>
         )
       })
     }

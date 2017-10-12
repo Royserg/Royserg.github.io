@@ -1,11 +1,10 @@
 import React, { Component } from 'react';
-import uuid from 'uuid';
 
 class AddCategory extends Component {
   constructor(){
     super();
     this.state = {
-      newCategory: {}
+      newCategory: ""
     }
   }
   
@@ -16,10 +15,7 @@ class AddCategory extends Component {
     if (newCategoryName === ""){
       alert('Training name is required!')
     } else {
-      this.setState({ newCategory:{
-        id: uuid.v4(),
-        name: newCategoryName
-      }}, function(){
+      this.setState({ newCategory: newCategoryName }, function(){
         //console.log(this.state);
         this.props.addCategory(this.state.newCategory);
       });
