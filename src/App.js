@@ -11,85 +11,96 @@ class App extends Component {
     super(props);
     
     this.state = {
-      currentCategory: '', 
+      currentCategory: 'Bench Press', 
       categories: [],
       workouts: []
     };
   }
-
-  componentWillMount(){
-    let currentCategory = this.state.currentCategory;
-    let db = fire.database();
-    let categories = this.state.categories;
-    let categoriesRef = db.ref('categories/Royserg');
-    
-    currentCategory = 'Bench Press'
-    
-    
-    categoriesRef.on('child_added', snap => {
-      categories.push({
-        id: snap.key,
-        name: snap.val(),
-      })
   
-      this.setState({
-        categories: categories,
-      })
-    })
-
+  componentWillMount(){
+    
+    let categories = this.state.categories;
+    let categoriesRef = fire.database().ref('categories/Royserg');
+    
     let workouts = this.state.workouts;
-    let workoutsRef = db.ref('workouts/Royserg/')
+    let workoutsRef = fire.database().ref('workouts/Royserg/')
     
     workoutsRef.on('child_added', snap => {
-      console.log(snap.val())
-      console.log(snap.key)
-      workouts.push({
+      let workout = {
         id: snap.key,
-        workouts: snap.val()
-      })
-    }) 
+        category: snap.val().category,
+        weight: snap.val().weight,
+        reps: snap.val().reps,
+      }
+      workouts.push(workout);
+    })
     
-    this.setState({
-        workouts: workouts,
-        currentCategory: currentCategory
+    this.setState({workouts:workouts})
+    
+    
+    categoriesRef.once('value', snap => {  
+      let keys = Object.keys(snap.val());
+      for(let i = 0; i < keys.length; i++){
+        let k = keys[i];
+        let categoryName = snap.val()[k]
+        categories.push({
+          id: k,
+          name: categoryName
+        })
+      }
+      
+      this.setState({
+        categories:categories
+      })
     })
   }
-          
   
-
   handleAddCategory(newCategory){
     let categories = this.state.categories;  
     let db = fire.database();
     let categoriesRef = db.ref('categories/Royserg');
-    categoriesRef.push( newCategory ); 
+    categoriesRef.push( newCategory ); // add cat to db
+    
+    // assign id to a variable
+    // and add the category to the state 
   }
   
   handleTrainingAdd(newTraining){
     let currentCategory = this.state.currentCategory;
-    let trainingsRef = fire.database().ref('workouts/Royserg/'+currentCategory)
+    let workouts = this.state.workouts;
     
-    if(!currentCategory){
-      alert('choose category');
-    } else {
-      trainingsRef.push(newTraining);
+    let workoutsRef = fire.database().ref('workouts/Royserg/')
+//    console.log(workoutsRef.push().key);
+    
+    let newWorkout= {
+      id: workoutsRef.push().key,
+      category: currentCategory,
+      weight: newTraining.weight,
+      reps: newTraining.reps
     }
+    
+//    workouts.push(newWorkout); // update state
+    
+    workoutsRef.push(newWorkout); // add to db
+    this.setState({workouts:workouts})
+    
     
   }
   
-  handleCategoryChange(categoryIndex){
+  handleCategoryChange(categoryName){
     let categories = this.state.categories;
-    
+      
     categories.forEach( (category,index) => {
       category.className = "";
+      if(category.name === categoryName){
+        category.className = 'active';
+      }  
     })
-    categories[categoryIndex].className = "active";
-    
+        
     this.setState({
-            currentCategory: categories[categoryIndex].id,
+            currentCategory: categoryName,
             categories: categories
       })
-    
-    console.log(this.state.currentCategory);
   }
   
   handleTrainingDelete(id){
@@ -114,7 +125,12 @@ class App extends Component {
         </Jumbotron>
         <Grid>
           <Trainings onDelete={this.handleTrainingDelete.bind(this)} workouts={this.state.workouts} currentCategory={this.state.currentCategory}/>
-          <AddTraining currentCategory={this.state.currentCategory} addTraining={this.handleTrainingAdd.bind(this)}/>
+          
+          <AddTraining 
+            currentCategory={this.state.currentCategory} 
+            addTraining={this.handleTrainingAdd.bind(this)}
+          />
+          
         </Grid>
       </div>
 
