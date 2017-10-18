@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Jumbotron, Grid } from 'react-bootstrap';
-import uuid from 'uuid';
+//import uuid from 'uuid';
 import TrainingCategories from './Components/TrainingCategories'
 import Trainings from './Components/Trainings'
 import AddTraining from './Components/AddTraining'
@@ -25,9 +25,10 @@ class App extends Component {
     let workouts = this.state.workouts;
     let workoutsRef = fire.database().ref('workouts/Royserg/')
     
+    // fix it to be like categories below:
     workoutsRef.on('child_added', snap => {
       let workout = {
-        id: snap.key,
+        id: snap.val().id,
         category: snap.val().category,
         weight: snap.val().weight,
         reps: snap.val().reps,
@@ -39,14 +40,19 @@ class App extends Component {
     
     
     categoriesRef.once('value', snap => {  
+//      console.log(snap.val()); // object of keys with objects
       let keys = Object.keys(snap.val());
       for(let i = 0; i < keys.length; i++){
         let k = keys[i];
-        let categoryName = snap.val()[k]
+        let id = snap.val()[k].id;
+        let categoryName = snap.val()[k].name;
         categories.push({
-          id: k,
+          id: id,
           name: categoryName
         })
+//        console.log(k)
+//        console.log(id)
+//        console.log(categoryName)
       }
       
       this.setState({
@@ -59,10 +65,18 @@ class App extends Component {
     let categories = this.state.categories;  
     let db = fire.database();
     let categoriesRef = db.ref('categories/Royserg');
-    categoriesRef.push( newCategory ); // add cat to db
     
-    // assign id to a variable
+    let id = categoriesRef.push().key;
+    let category = {
+      id: id,
+      name: newCategory
+    }
     // and add the category to the state 
+    categories.push(category);
+    this.setState({categories:categories})
+    // add category to the db
+    categoriesRef.push(category);
+    
   }
   
   handleTrainingAdd(newTraining){
@@ -70,7 +84,6 @@ class App extends Component {
     let workouts = this.state.workouts;
     
     let workoutsRef = fire.database().ref('workouts/Royserg/')
-//    console.log(workoutsRef.push().key);
     
     let newWorkout= {
       id: workoutsRef.push().key,
@@ -79,10 +92,10 @@ class App extends Component {
       reps: newTraining.reps
     }
     
-//    workouts.push(newWorkout); // update state
+    workouts.push(newWorkout); // update state
+    this.setState({workouts:workouts})
     
     workoutsRef.push(newWorkout); // add to db
-    this.setState({workouts:workouts})
     
     
   }
